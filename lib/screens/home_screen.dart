@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final storageService = Provider.of<LocalStorageService>(context, listen: false);
     _stations = await storageService.getBikeStations();
 
-    // Use the new latitude/longitude properties instead of currentPosition
     if (locationService.currentLatitude != null && locationService.currentLongitude != null) {
       setState(() {
         _currentLocation = LatLng(
@@ -40,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       });
       
-      // Center map on user location
       _mapController.move(_currentLocation!, 14.0);
     }
 
@@ -80,7 +78,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('LOOP BikeShare'),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/app_logo.jpg',
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text(
+              'LOOP BikeShare',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Color(0xFF0D9A00),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -92,179 +126,279 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Interactive OpenStreetMap
-          Expanded(
-            flex: 2,
-            child: FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                center: LatLng(19.0540, 72.8302), // Bandra center
-                zoom: 14.0,
-                maxZoom: 18.0,
-                minZoom: 10.0,
-              ),
-              children: [
-                // OpenStreetMap Tile Layer
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.loop.bikeshare',
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Interactive OpenStreetMap
+            Expanded(
+              flex: 2,
+              child: FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  center: _currentLocation ?? LatLng(19.0540, 72.8302),
+                  zoom: 14.0,
+                  maxZoom: 18.0,
+                  minZoom: 10.0,
                 ),
-                // User Location Marker
-                if (_currentLocation != null)
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _currentLocation!,
-                      builder: (ctx) => GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          child: Icon(
-                            Icons.location_on,
-                            color: Colors.blue,
-                            size: 30,
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.loop.bikeshare',
+                  ),
+                  if (_currentLocation != null)
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: _currentLocation!,
+                          width: 40,
+                          height: 40,
+                          builder: (ctx) => Container(
+                            child: Icon(
+                              Icons.location_pin,
+                              color: Colors.blue,
+                              size: 40,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-                // Bike Station Markers
-                MarkerLayer(
-                  markers: _stations.map((station) {
-                    return Marker(
-                      point: LatLng(station.latitude, station.longitude),
-                      builder: (ctx) => GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BikeStationScreen(station: station),
+                  MarkerLayer(
+                    markers: _stations.map((station) {
+                      return Marker(
+                        point: LatLng(station.latitude, station.longitude),
+                        width: 50,
+                        height: 50,
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BikeStationScreen(station: station),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: station.availableBikes > 0 
+                                  ? Color(0xFF0D9A00).withOpacity(0.9)
+                                  : Colors.red.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 50.0,
-                          height: 50.0,
-                          decoration: BoxDecoration(
-                            color: station.availableBikes > 0 
-                                ? Color(0xFF0D9A00).withOpacity(0.9)
-                                : Colors.red.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          child: Center(
-                            child: Text(
-                              station.availableBikes.toString(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.pedal_bike,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  Text(
+                                    station.availableBikes.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-
-          // Stations List Section
-          Expanded(
-            flex: 1,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 4,
-                    color: Colors.black12,
-                    offset: Offset(0, -2),
+                      );
+                    }).toList(),
                   ),
                 ],
+              ),
+            ),
+
+            // Stations List Section
+            Expanded(
+              flex: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 16,
+                      color: Colors.black26,
+                      offset: Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Header
+                    Container(
+                      padding: EdgeInsets.fromLTRB(20, 16, 20, 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF0D9A00).withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.pedal_bike, color: Color(0xFF0D9A00), size: 20),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Nearby Stations',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Spacer(),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${_stations.length}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0D9A00),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Stations List
+                    Expanded(
+                      child: _stations.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(color: Color(0xFF0D9A00)),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Loading stations...',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: ListView.builder(
+                                padding: EdgeInsets.only(bottom: 16),
+                                itemCount: _stations.length,
+                                itemBuilder: (context, index) {
+                                  final station = _stations[index];
+                                  return _buildStationListItem(station);
+                                },
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Action Button Section
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.grey[300]!,
+                    width: 1,
+                  ),
+                ),
               ),
               child: Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.all(16),
+                  // Quick Stats
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon(Icons.pedal_bike, color: Color(0xFF0D9A00)),
-                        SizedBox(width: 8),
-                        Text(
-                          'Nearby Bike Stations',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0D9A00),
-                          ),
-                        ),
-                        Spacer(),
-                        Text(
-                          '${_stations.length} stations',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
+                        _buildQuickStat('Total Stations', _stations.length.toString()),
+                        _buildQuickStat('Available Bikes', 
+                          _stations.fold(0, (sum, station) => sum + station.availableBikes).toString()),
+                        _buildQuickStat('Nearest', 
+                          _findNearestStation()?.availableBikes.toString() ?? '0'),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: _stations.isEmpty
-                        ? Center(child: CircularProgressIndicator(color: Color(0xFF0D9A00)))
-                        : ListView.builder(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: _stations.length,
-                            itemBuilder: (context, index) {
-                              final station = _stations[index];
-                              return _buildStationListItem(station);
-                            },
+                  SizedBox(height: 16),
+                  
+                  // Action Button
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      final nearestStation = _findNearestStation();
+                      if (nearestStation != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BikeStationScreen(station: nearestStation),
                           ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('No stations found nearby'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.electric_bike, size: 24),
+                    label: Text(
+                      'Find Nearest Bike',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0D9A00),
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 2,
+                      shadowColor: Color(0xFF0D9A00).withOpacity(0.3),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-
-          // Action Button Section
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey[300]!)),
-            ),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                final nearestStation = _findNearestStation();
-                if (nearestStation != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BikeStationScreen(station: nearestStation),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('No stations found nearby')),
-                  );
-                }
-              },
-              icon: Icon(Icons.directions_bike),
-              label: Text('Find Nearest Bike'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0D9A00),
-                foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 2,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -288,81 +422,160 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         : 0.0;
 
-    return Card(
-      margin: EdgeInsets.only(bottom: 8),
-      elevation: 2,
-      child: ListTile(
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: station.availableBikes > 0 
-                ? Color(0xFF0D9A00).withOpacity(0.1)
-                : Colors.red.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.pedal_bike,
-            color: station.availableBikes > 0 ? Color(0xFF0D9A00) : Colors.red,
-            size: 20,
-          ),
-        ),
-        title: Text(
-          station.name,
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              station.address,
-              style: TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 4),
-            Row(
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        elevation: 2,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BikeStationScreen(station: station),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Icon(Icons.directions_bike, size: 12, color: Colors.grey),
-                SizedBox(width: 4),
-                Text(
-                  '${station.availableBikes} bikes available',
-                  style: TextStyle(fontSize: 11),
+                // Availability Indicator
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: station.availableBikes > 0 
+                        ? Color(0xFF0D9A00).withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.pedal_bike,
+                    color: station.availableBikes > 0 ? Color(0xFF0D9A00) : Colors.red,
+                    size: 20,
+                  ),
                 ),
-                SizedBox(width: 12),
-                Icon(Icons.place, size: 12, color: Colors.grey),
-                SizedBox(width: 4),
-                Text(
-                  '${distance.toStringAsFixed(1)} km',
-                  style: TextStyle(fontSize: 11),
+                SizedBox(width: 16),
+                
+                // Station Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        station.name,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        station.address,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildInfoChip(
+                            '${station.availableBikes} bikes',
+                            Icons.directions_bike,
+                            station.availableBikes > 0 ? Color(0xFF0D9A00) : Colors.red,
+                          ),
+                          SizedBox(width: 8),
+                          _buildInfoChip(
+                            '${distance.toStringAsFixed(1)} km',
+                            Icons.place,
+                            Colors.blue,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Status Badge
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: station.availableBikes > 0 
+                        ? Color(0xFF0D9A00).withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    station.availableBikes > 0 ? 'Available' : 'Full',
+                    style: TextStyle(
+                      color: station.availableBikes > 0 ? Color(0xFF0D9A00) : Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-        trailing: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: station.availableBikes > 0 ? Color(0xFF0D9A00) : Colors.red,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            station.availableBikes > 0 ? 'Available' : 'Full',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BikeStationScreen(station: station),
-            ),
-          );
-        },
       ),
+    );
+  }
+
+  Widget _buildInfoChip(String text, IconData icon, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickStat(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0D9A00),
+          ),
+        ),
+        SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
     );
   }
 }

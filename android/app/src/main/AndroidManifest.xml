@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:label="LOOP BikeShare"
+        android:label="LOOP"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

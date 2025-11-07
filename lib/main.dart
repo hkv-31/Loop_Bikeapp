@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocalStorageService()),
       ],
       child: MaterialApp(
-        title: 'LOOP BikeShare',
+        title: 'LOOP',
         theme: ThemeData(
           primaryColor: Color(0xFF0D9A00),
           colorScheme: ColorScheme.light(

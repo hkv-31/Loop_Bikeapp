@@ -30,28 +30,35 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // LOOP Logo
+                // LOOP Logo - Updated to use your image
                 Container(
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: Color(0xFF0D9A00),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Center(
-                    child: Text(
-                      'LOOP',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/app_logo.jpg',
+                        width: 110,
+                        height: 110,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
                 SizedBox(height: 24),
                 Text(
-                  'LOOP BikeShare',
+                  'LOOP',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
