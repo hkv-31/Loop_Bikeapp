@@ -25,24 +25,30 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initializeData() async {
-    final locationService = Provider.of<LocationService>(context, listen: false);
-    await locationService.getCurrentLocation();
-    
-    final storageService = Provider.of<LocalStorageService>(context, listen: false);
-    _stations = await storageService.getBikeStations();
-
-    if (locationService.currentLatitude != null && locationService.currentLongitude != null) {
-      setState(() {
-        _currentLocation = LatLng(
-          locationService.currentLatitude!,
-          locationService.currentLongitude!,
-        );
-      });
+    // Use WidgetsBinding to ensure this runs after build
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final locationService = Provider.of<LocationService>(context, listen: false);
+      await locationService.getCurrentLocation();
       
-      _mapController.move(_currentLocation!, 14.0);
-    }
+      final storageService = Provider.of<LocalStorageService>(context, listen: false);
+      final stations = await storageService.getBikeStations();
 
-    setState(() {});
+      if (locationService.currentLatitude != null && locationService.currentLongitude != null) {
+        setState(() {
+          _currentLocation = LatLng(
+            locationService.currentLatitude!,
+            locationService.currentLongitude!,
+          );
+          _stations = stations;
+        });
+        
+        _mapController.move(_currentLocation!, 14.0);
+      } else {
+        setState(() {
+          _stations = stations;
+        });
+      }
+    });
   }
 
   BikeStation? _findNearestStation() {
@@ -100,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'assets/images/app_logo.jpg',
                     width: 30,
                     height: 30,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

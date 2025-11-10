@@ -5,11 +5,12 @@ import '../services/payment_service.dart';
 import '../services/local_storage_service.dart';
 import '../models/models.dart';
 import 'history_screen.dart';
+import 'ride_completion_screen.dart';  // ADD THIS IMPORT
 
 class PaymentScreen extends StatefulWidget {
   final Ride ride;
 
-  const PaymentScreen({Key? key, required this.ride}) : super(key: key);
+  const PaymentScreen({super.key, required this.ride});
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -89,10 +90,10 @@ Future<void> _processPayment() async {
   }
 }
 
-  void _navigateToHistory() {
+  void _navigateToCompletion() {  // CHANGED THIS METHOD
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => HistoryScreen()),
+      MaterialPageRoute(builder: (context) => RideCompletionScreen(ride: widget.ride)),
       (route) => false,
     );
   }
@@ -116,14 +117,14 @@ Future<void> _processPayment() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Payment Method',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             _buildPaymentMethodOption(
               0,
               'Credit/Debit Card',
@@ -150,7 +151,7 @@ Future<void> _processPayment() async {
 
   Widget _buildPaymentMethodOption(int index, String title, IconData icon, Color color) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: _selectedPaymentMethod == index ? color.withAlpha(20) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
@@ -181,17 +182,17 @@ Future<void> _processPayment() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Card Details',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _cardNumberController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Card Number',
                 hintText: '4242 4242 4242 4242',
                 prefixIcon: Icon(Icons.credit_card),
@@ -199,24 +200,24 @@ Future<void> _processPayment() async {
               ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: _expiryController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Expiry Date',
                       hintText: 'MM/YY',
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
                     controller: _cvvController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'CVV',
                       hintText: '123',
                       border: OutlineInputBorder(),
@@ -227,10 +228,10 @@ Future<void> _processPayment() async {
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             TextFormField(
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Cardholder Name',
                 hintText: 'John Doe',
                 border: OutlineInputBorder(),
@@ -250,34 +251,34 @@ Future<void> _processPayment() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'UPI Payment',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _upiIdController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'UPI ID',
                 hintText: 'yourname@upi',
                 prefixIcon: Icon(Icons.payment),
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.orange[50],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info, color: Colors.orange, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.info, color: Colors.orange, size: 20),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'You will be redirected to your UPI app for payment',
@@ -315,21 +316,21 @@ Future<void> _processPayment() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Net Banking',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Select Bank',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.account_balance),
               ),
-              value: selectedBank,
+              initialValue: selectedBank,
               items: banks.map((String bank) {
                 return DropdownMenuItem<String>(
                   value: bank,
@@ -342,17 +343,17 @@ Future<void> _processPayment() async {
                 });
               },
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.blue[50],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.security, color: Colors.blue, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.security, color: Colors.blue, size: 20),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Secure net banking gateway. You will be redirected to your bank\'s website.',
@@ -390,7 +391,7 @@ Future<void> _processPayment() async {
         break;
       default:
         buttonText = 'Pay Now';
-        buttonColor = Color(0xFF0D9A00);
+        buttonColor = const Color(0xFF0D9A00);
     }
 
     return ElevatedButton(
@@ -398,14 +399,14 @@ Future<void> _processPayment() async {
       style: ElevatedButton.styleFrom(
         backgroundColor: buttonColor,
         foregroundColor: Colors.white,
-        minimumSize: Size(double.infinity, 55),
+        minimumSize: const Size(double.infinity, 55),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 3,
       ),
       child: _isProcessing
-          ? Row(
+          ? const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
@@ -423,11 +424,11 @@ Future<void> _processPayment() async {
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.lock, size: 20),
-                SizedBox(width: 12),
+                const Icon(Icons.lock, size: 20),
+                const SizedBox(width: 12),
                 Text(
                   buttonText,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -440,8 +441,8 @@ Future<void> _processPayment() async {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment'),
-        backgroundColor: Color(0xFF0D9A00),
+        title: const Text('Payment'),
+        backgroundColor: const Color(0xFF0D9A00),
         foregroundColor: Colors.white,
       ),
       body: _isProcessing || _paymentSuccess || _paymentFailed
@@ -461,7 +462,7 @@ Future<void> _processPayment() async {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          const Row(
                             children: [
                               Icon(Icons.receipt_long, color: Color(0xFF0D9A00)),
                               SizedBox(width: 8),
@@ -474,15 +475,15 @@ Future<void> _processPayment() async {
                               ),
                             ],
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           _buildSummaryRow('Date & Time', dateFormat.format(widget.ride.startTime)),
                           _buildSummaryRow('Duration', '${widget.ride.duration} minutes'),
                           _buildSummaryRow('Distance', '${widget.ride.distance.toStringAsFixed(1)} km'),
-                          Divider(thickness: 1),
+                          const Divider(thickness: 1),
                           _buildSummaryRow('Base Fare', '₹10'),
                           _buildSummaryRow('Distance Fare', '₹${(widget.ride.distance * 5).toStringAsFixed(0)}'),
                           _buildSummaryRow('Time Fare', '₹${(widget.ride.duration * 0.5).toStringAsFixed(0)}'),
-                          Divider(thickness: 2),
+                          const Divider(thickness: 2),
                           _buildSummaryRow(
                             'Total Amount',
                             '₹${widget.ride.cost.toStringAsFixed(0)}',
@@ -492,29 +493,29 @@ Future<void> _processPayment() async {
                       ),
                     ),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Payment Methods
                   _buildPaymentMethodSelector(),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Payment Form based on selection
                   if (_selectedPaymentMethod == 0) _buildCardPaymentForm(),
                   if (_selectedPaymentMethod == 1) _buildUpiPaymentForm(),
                   if (_selectedPaymentMethod == 2) _buildNetBankingForm(),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Security Badge
                   Container(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.green[50],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.verified_user, color: Colors.green, size: 20),
-                        SizedBox(width: 12),
+                        const Icon(Icons.verified_user, color: Colors.green, size: 20),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -539,11 +540,11 @@ Future<void> _processPayment() async {
                       ],
                     ),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Pay Button
                   _buildPaymentButton(),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -578,11 +579,11 @@ Future<void> _processPayment() async {
               _paymentError ?? 'Payment could not be processed\nPlease try again',
             ),
 
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           if (_paymentSuccess) ...[
             Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.green[50],
                 borderRadius: BorderRadius.circular(12),
@@ -596,7 +597,7 @@ Future<void> _processPayment() async {
                       color: Colors.green[700],
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _paymentId ?? 'N/A',
                     style: TextStyle(
@@ -609,19 +610,19 @@ Future<void> _processPayment() async {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _navigateToHistory,
+              onPressed: _navigateToCompletion,  // CHANGED THIS CALL
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF0D9A00),
+                backgroundColor: const Color(0xFF0D9A00),
                 foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 55),
+                minimumSize: const Size(double.infinity, 55),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(
-                'View Ride History',
+              child: const Text(
+                'View Ride Completion',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -633,19 +634,19 @@ Future<void> _processPayment() async {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 55),
+                minimumSize: const Size(double.infinity, 55),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Retry Payment',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             TextButton(
-              onPressed: _navigateToHistory,
+              onPressed: _navigateToCompletion,  // CHANGED THIS CALL
               child: Text(
                 'Skip for Now',
                 style: TextStyle(
@@ -676,7 +677,7 @@ Future<void> _processPayment() async {
             color: color,
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Text(
           title,
           style: TextStyle(
@@ -685,7 +686,7 @@ Future<void> _processPayment() async {
             color: color,
           ),
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Text(
           subtitle,
           style: TextStyle(
@@ -710,7 +711,7 @@ Future<void> _processPayment() async {
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Color(0xFF0D9A00) : Colors.black,
+              color: isTotal ? const Color(0xFF0D9A00) : Colors.black,
             ),
           ),
           Text(
@@ -718,7 +719,7 @@ Future<void> _processPayment() async {
             style: TextStyle(
               fontSize: isTotal ? 16 : 14,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Color(0xFF0D9A00) : Colors.black,
+              color: isTotal ? const Color(0xFF0D9A00) : Colors.black,
             ),
           ),
         ],

@@ -26,9 +26,14 @@ class AuthService with ChangeNotifier {
         createdAt: DateTime.now(),
       );
 
-      // Save to local database
-      final storage = LocalStorageService();
-      await storage.saveUser(_currentUser!);
+      // Save to local database with error handling
+      try {
+        final storage = LocalStorageService();
+        await storage.saveUser(_currentUser!);
+      } catch (e) {
+        print('Warning: Could not save user to database: $e');
+        // Continue even if database save fails for demo
+      }
 
       _isLoading = false;
       notifyListeners();

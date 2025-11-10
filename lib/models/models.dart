@@ -3,12 +3,14 @@ class UserModel {
   final String name;
   final String email;
   final DateTime createdAt;
+  final bool hasSecurityDeposit;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.createdAt,
+    this.hasSecurityDeposit = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +19,7 @@ class UserModel {
       'name': name,
       'email': email,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'hasSecurityDeposit': hasSecurityDeposit ? 1 : 0,
     };
   }
 
@@ -26,6 +29,23 @@ class UserModel {
       name: map['name'],
       email: map['email'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      hasSecurityDeposit: map['hasSecurityDeposit'] == 1,
+    );
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    DateTime? createdAt,
+    bool? hasSecurityDeposit,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      createdAt: createdAt ?? this.createdAt,
+      hasSecurityDeposit: hasSecurityDeposit ?? this.hasSecurityDeposit,
     );
   }
 }
@@ -38,6 +58,7 @@ class BikeStation {
   final int availableBikes;
   final int totalCapacity;
   final String address;
+  final bool isCollege;
 
   BikeStation({
     required this.id,
@@ -47,6 +68,7 @@ class BikeStation {
     required this.availableBikes,
     required this.totalCapacity,
     required this.address,
+    this.isCollege = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -58,6 +80,7 @@ class BikeStation {
       'availableBikes': availableBikes,
       'totalCapacity': totalCapacity,
       'address': address,
+      'isCollege': isCollege ? 1 : 0,
     };
   }
 
@@ -70,20 +93,29 @@ class BikeStation {
       availableBikes: map['availableBikes'],
       totalCapacity: map['totalCapacity'],
       address: map['address'],
+      isCollege: map['isCollege'] == 1,
     );
   }
 
   BikeStation copyWith({
+    String? id,
+    String? name,
+    double? latitude,
+    double? longitude,
     int? availableBikes,
+    int? totalCapacity,
+    String? address,
+    bool? isCollege,
   }) {
     return BikeStation(
-      id: id,
-      name: name,
-      latitude: latitude,
-      longitude: longitude,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       availableBikes: availableBikes ?? this.availableBikes,
-      totalCapacity: totalCapacity,
-      address: address,
+      totalCapacity: totalCapacity ?? this.totalCapacity,
+      address: address ?? this.address,
+      isCollege: isCollege ?? this.isCollege,
     );
   }
 }

@@ -12,7 +12,7 @@ import 'dart:math' as math;
 class ActiveRideScreen extends StatefulWidget {
   final BikeStation station;
 
-  const ActiveRideScreen({Key? key, required this.station}) : super(key: key);
+  const ActiveRideScreen({super.key, required this.station});
 
   @override
   _ActiveRideScreenState createState() => _ActiveRideScreenState();
@@ -84,7 +84,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _secondsElapsed++;
         _rideDuration = Duration(seconds: _secondsElapsed);
@@ -145,6 +145,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
       stripePaymentId: null,
     );
 
+    // Navigate to Payment Screen (which will then go to Completion Screen)
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -157,19 +158,19 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Emergency Stop'),
-        content: Text('Are you sure you want to stop the ride immediately? This will end your current ride.'),
+        title: const Text('Emergency Stop'),
+        content: const Text('Are you sure you want to stop the ride immediately? This will end your current ride.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _endRide();
             },
-            child: Text(
+            child: const Text(
               'Stop Ride',
               style: TextStyle(color: Colors.red),
             ),
@@ -195,18 +196,18 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Active Ride'),
-        backgroundColor: Color(0xFF0D9A00),
+        title: const Text('Active Ride'),
+        backgroundColor: const Color(0xFF0D9A00),
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: Icon(Icons.my_location),
+            icon: const Icon(Icons.my_location),
             onPressed: _centerMapOnUser,
             tooltip: 'Center on my location',
           ),
           IconButton(
-            icon: Icon(Icons.warning),
+            icon: const Icon(Icons.warning),
             onPressed: _emergencyStop,
             tooltip: 'Emergency Stop',
           ),
@@ -216,7 +217,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
         child: Column(
           children: [
             // Map Section - Fixed height
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).size.height * 0.4, // 40% of screen
               child: Stack(
                 children: [
@@ -241,7 +242,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                           polylines: [
                             Polyline(
                               points: _routePoints,
-                              color: Color(0xFF0D9A00).withAlpha(150),
+                              color: const Color(0xFF0D9A00).withAlpha(150),
                               strokeWidth: 6.0,
                             ),
                           ],
@@ -256,7 +257,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                               width: 40,
                               height: 40,
                               builder: (ctx) => Container(
-                                child: Icon(
+                                child: const Icon(
                                   Icons.directions_bike,
                                   color: Colors.blue,
                                   size: 40,
@@ -274,7 +275,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                             width: 30,
                             height: 30,
                             builder: (ctx) => Container(
-                              child: Icon(
+                              child: const Icon(
                                 Icons.location_pin,
                                 color: Colors.green,
                                 size: 30,
@@ -300,7 +301,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
+                                const Row(
                                   children: [
                                     Icon(Icons.navigation, size: 16, color: Color(0xFF0D9A00)),
                                     SizedBox(width: 8),
@@ -314,7 +315,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Following suggested route',
                                   style: TextStyle(fontSize: 10, color: Colors.grey[600]),
@@ -347,13 +348,13 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.directions_bike,
                               size: 48,
                               color: Color(0xFF0D9A00),
                             ),
-                            SizedBox(height: 12),
-                            Text(
+                            const SizedBox(height: 12),
+                            const Text(
                               'Ride in Progress',
                               style: TextStyle(
                                 fontSize: 20,
@@ -361,7 +362,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                                 color: Color(0xFF0D9A00),
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               'Started from ${widget.station.name}',
                               style: TextStyle(
@@ -370,14 +371,14 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Color(0xFF0D9A00).withAlpha(25),
+                                color: const Color(0xFF0D9A00).withAlpha(25),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Live Tracking Active',
                                 style: TextStyle(
                                   color: Color(0xFF0D9A00),
@@ -390,7 +391,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Ride Metrics
                     Row(
@@ -403,7 +404,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                             Colors.blue,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: _buildMetricCard(
                             'Distance',
@@ -414,7 +415,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Expanded(
@@ -422,10 +423,10 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                             'Current Cost',
                             '₹${_currentCost.toStringAsFixed(0)}',
                             Icons.currency_rupee,
-                            Color(0xFF0D9A00),
+                            const Color(0xFF0D9A00),
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: _buildMetricCard(
                             'Speed',
@@ -436,7 +437,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Quick Actions
                     Row(
@@ -444,15 +445,15 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: _centerMapOnUser,
-                            icon: Icon(Icons.my_location, size: 16),
-                            label: Text('Center Map'),
+                            icon: const Icon(Icons.my_location, size: 16),
+                            label: const Text('Center Map'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Color(0xFF0D9A00),
-                              side: BorderSide(color: Color(0xFF0D9A00)),
+                              foregroundColor: const Color(0xFF0D9A00),
+                              side: const BorderSide(color: Color(0xFF0D9A00)),
                             ),
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () {
@@ -460,50 +461,50 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: Text('Route Information'),
+                                  title: const Text('Route Information'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Suggested bike route active'),
-                                      SizedBox(height: 8),
+                                      const Text('Suggested bike route active'),
+                                      const SizedBox(height: 8),
                                       Text('• Distance: ${_distanceTraveled.toStringAsFixed(1)} km'),
                                       Text('• Duration: ${_formatDuration(_rideDuration)}'),
-                                      Text('• Bike-friendly roads'),
+                                      const Text('• Bike-friendly roads'),
                                     ],
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
+                                      child: const Text('OK'),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                            icon: Icon(Icons.route, size: 16),
-                            label: Text('Route Info'),
+                            icon: const Icon(Icons.route, size: 16),
+                            label: const Text('Route Info'),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.blue,
-                              side: BorderSide(color: Colors.blue),
+                              side: const BorderSide(color: Colors.blue),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Safety Tips
                     Container(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.blue[50],
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.security, color: Colors.blue, size: 16),
-                          SizedBox(width: 8),
+                          const Icon(Icons.security, color: Colors.blue, size: 16),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'Follow the green route for bike-friendly roads',
@@ -516,7 +517,7 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // End Ride Button
                     ElevatedButton(
@@ -524,13 +525,13 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
-                        minimumSize: Size(double.infinity, 55),
+                        minimumSize: const Size(double.infinity, 55),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 3,
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.stop, size: 24),
@@ -560,15 +561,15 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
         child: Column(
           children: [
             Icon(icon, color: color, size: 24),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               title,
               style: TextStyle(

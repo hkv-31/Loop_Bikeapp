@@ -9,7 +9,56 @@ class PaymentService with ChangeNotifier {
   bool get isProcessing => _isProcessing;
   String? get error => _error;
 
-  // Mock Stripe payment simulation
+  // Security Deposit payment - ₹100 one-time payment
+  Future<Map<String, dynamic>> processSecurityDeposit(String userId) async {
+    try {
+      _isProcessing = true;
+      _error = null;
+      notifyListeners();
+
+      // Simulate payment processing delay
+      await Future.delayed(const Duration(seconds: 2));
+
+      // ALWAYS SUCCEED for demo
+      final depositId = 'dep_${DateTime.now().millisecondsSinceEpoch}';
+      
+      // Update user deposit status in database
+      final storage = LocalStorageService();
+      await storage.updateUserDepositStatus(userId, true);
+      
+      _isProcessing = false;
+      notifyListeners();
+      
+      return {
+        'success': true,
+        'paymentId': depositId,
+        'amount': 100.0,
+        'message': 'Security deposit payment successful',
+      };
+    } catch (e) {
+      _isProcessing = false;
+      _error = 'Deposit processing error: $e';
+      notifyListeners();
+      
+      return {
+        'success': false,
+        'error': 'Deposit processing failed',
+      };
+    }
+  }
+
+  // Check if user has paid security deposit
+  Future<bool> checkSecurityDeposit(String userId) async {
+    try {
+      final storage = LocalStorageService();
+      final user = await storage.getUser(userId);
+      return user?.hasSecurityDeposit ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Mock Stripe payment simulation for ride payments - ALWAYS SUCCEED
   Future<Map<String, dynamic>> processMockPayment(Ride ride) async {
     try {
       _isProcessing = true;
@@ -17,32 +66,19 @@ class PaymentService with ChangeNotifier {
       notifyListeners();
 
       // Simulate payment processing delay
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
 
-      // 90% success rate for demo
-      final isSuccess = DateTime.now().millisecond % 10 != 0;
+      // ALWAYS SUCCEED for demo
+      final paymentId = 'pi_${DateTime.now().millisecondsSinceEpoch}';
       
-      if (isSuccess) {
-        final paymentId = 'pi_${DateTime.now().millisecondsSinceEpoch}';
-        
-        _isProcessing = false;
-        notifyListeners();
-        
-        return {
-          'success': true,
-          'paymentId': paymentId,
-          'message': 'Payment processed successfully',
-        };
-      } else {
-        _isProcessing = false;
-        _error = 'Payment failed: Insufficient funds';
-        notifyListeners();
-        
-        return {
-          'success': false,
-          'error': 'Insufficient funds',
-        };
-      }
+      _isProcessing = false;
+      notifyListeners();
+      
+      return {
+        'success': true,
+        'paymentId': paymentId,
+        'message': 'Payment processed successfully',
+      };
     } catch (e) {
       _isProcessing = false;
       _error = 'Payment processing error: $e';

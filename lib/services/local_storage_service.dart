@@ -20,8 +20,28 @@ class LocalStorageService with ChangeNotifier {
     String path = join(await getDatabasesPath(), 'loop_bikeshare.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 3, // Increased version for schema update
       onCreate: _createTables,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // Handle database upgrades
+        if (oldVersion < 2) {
+          // Recreate tables if upgrading from very old version
+          await db.execute('DROP TABLE IF EXISTS bike_stations');
+          await db.execute('DROP TABLE IF EXISTS users');
+          await db.execute('DROP TABLE IF EXISTS rides');
+          await _createTables(db, newVersion);
+        } else if (oldVersion < 3) {
+          // Add new columns to existing tables
+          await db.execute('''
+            ALTER TABLE bike_stations ADD COLUMN isCollege INTEGER NOT NULL DEFAULT 0
+          ''');
+          await db.execute('''
+            ALTER TABLE users ADD COLUMN hasSecurityDeposit INTEGER NOT NULL DEFAULT 0
+          ''');
+          // Re-insert sample stations with new schema
+          await _insertSampleStations(db);
+        }
+      },
     );
   }
 
@@ -32,7 +52,8 @@ class LocalStorageService with ChangeNotifier {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT,
-        createdAt INTEGER NOT NULL
+        createdAt INTEGER NOT NULL,
+        hasSecurityDeposit INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -45,7 +66,8 @@ class LocalStorageService with ChangeNotifier {
         longitude REAL NOT NULL,
         availableBikes INTEGER NOT NULL,
         totalCapacity INTEGER NOT NULL,
-        address TEXT NOT NULL
+        address TEXT NOT NULL,
+        isCollege INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -66,13 +88,13 @@ class LocalStorageService with ChangeNotifier {
       )
     ''');
 
-    // Insert sample bike stations in Bandra, Mumbai
+    // Insert sample bike stations including colleges
     await _insertSampleStations(db);
   }
 
   Future<void> _insertSampleStations(Database db) async {
     final stations = [
-      // Bandra West stations
+      // Original Bandra West stations
       BikeStation(
         id: '1',
         name: 'Bandra Station West',
@@ -81,6 +103,7 @@ class LocalStorageService with ChangeNotifier {
         availableBikes: 5,
         totalCapacity: 10,
         address: 'Near Bandra Railway Station West, Bandra, Mumbai',
+        isCollege: false,
       ),
       BikeStation(
         id: '2',
@@ -90,6 +113,7 @@ class LocalStorageService with ChangeNotifier {
         availableBikes: 3,
         totalCapacity: 8,
         address: 'Bandra Bandstand Promenade, Bandra, Mumbai',
+        isCollege: false,
       ),
       BikeStation(
         id: '3',
@@ -99,6 +123,7 @@ class LocalStorageService with ChangeNotifier {
         availableBikes: 7,
         totalCapacity: 12,
         address: 'Carter Road Amphitheater, Bandra, Mumbai',
+        isCollege: false,
       ),
       BikeStation(
         id: '4',
@@ -108,6 +133,7 @@ class LocalStorageService with ChangeNotifier {
         availableBikes: 2,
         totalCapacity: 6,
         address: 'Linking Road Shopping District, Bandra, Mumbai',
+        isCollege: false,
       ),
       BikeStation(
         id: '5',
@@ -117,6 +143,49 @@ class LocalStorageService with ChangeNotifier {
         availableBikes: 8,
         totalCapacity: 15,
         address: 'Mount Mary Church, Bandra, Mumbai',
+        isCollege: false,
+      ),
+      
+      // College Stations - Added for college presentation
+      BikeStation(
+        id: '6',
+        name: 'Atlas Skilltech University - BKC',
+        latitude: 19.0685,
+        longitude: 72.8655,
+        availableBikes: 6,
+        totalCapacity: 12,
+        address: 'Equinox Business Park, Bandra Kurla Complex, Mumbai',
+        isCollege: true,
+      ),
+      BikeStation(
+        id: '7',
+        name: 'Jai Hind College - Churchgate',
+        latitude: 18.9306,
+        longitude: 72.8256,
+        availableBikes: 4,
+        totalCapacity: 8,
+        address: 'A Road, Churchgate, Mumbai',
+        isCollege: true,
+      ),
+      BikeStation(
+        id: '8',
+        name: 'HR College - Churchgate',
+        latitude: 18.9320,
+        longitude: 72.8263,
+        availableBikes: 5,
+        totalCapacity: 10,
+        address: 'Dinshaw Wachha Road, Churchgate, Mumbai',
+        isCollege: true,
+      ),
+      BikeStation(
+        id: '9',
+        name: 'Mithibai College - Vile Parle',
+        latitude: 19.1028,
+        longitude: 72.8498,
+        availableBikes: 7,
+        totalCapacity: 15,
+        address: 'Vile Parle West, Mumbai',
+        isCollege: true,
       ),
     ];
 
@@ -144,6 +213,17 @@ class LocalStorageService with ChangeNotifier {
       return UserModel.fromMap(maps.first);
     }
     return null;
+  }
+
+  Future<void> updateUserDepositStatus(String userId, bool hasDeposit) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {'hasSecurityDeposit': hasDeposit ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+    notifyListeners();
   }
 
   // Bike station operations
